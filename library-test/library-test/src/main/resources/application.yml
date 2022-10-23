@@ -1,0 +1,23 @@
+#MyBatis配置
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml  # xml文件在springboot中的位置
+  type-aliases-package: com.zhang.librarytest.domain #包的别名
+
+#配置数据库
+spring:
+  datasource:
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql:///sx
+  web:
+    resources:
+      static-locations: classpath:/static/, classpath:/templates/
+#修改端口
+server:
+  port: 9000
+
+#  开启日志
+logging:
+  level:
+    com.zhang: debug

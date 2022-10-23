@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhang.librarytest.dao.UserDao">
+    <insert id="insert" parameterType="User">
+        insert into lib_user (
+        <trim suffixOverrides=",">
+
+
+            <if test="name!=null and name!=''">
+                name,
+            </if>
+
+
+            <if test="birthday!=null and birthday!=''">
+                birthday,
+            </if>
+
+
+            <if test="academy!=null and academy!=''">
+                academy,
+            </if>
+
+
+            <if test="grade!=null and grade!=''">
+                grade,
+            </if>
+
+
+            <if test="sex!=null ">
+                sex,
+            </if>
+
+
+            <if test="score!=null ">
+                score,
+            </if>
+            <if test="post!=null ">
+                post
+            </if>
+        </trim>
+        ) values(
+        <trim suffixOverrides=",">
+
+
+            <if test="name!=null and name!=''">
+                #{name},
+            </if>
+            <if test="birthday!=null and birthday != '' ">
+                #{birthday},
+            </if>
+            <if test="academy!=null and academy!=''">
+                #{academy},
+            </if>
+            <if test="grade!=null and grade!=''">
+                #{grade},
+            </if>
+            <if test="sex!=null ">
+                #{sex},
+            </if>
+            <if test="score!=null ">
+                #{score},
+            </if>
+            <if test="post!=null and post!=''">
+                #{post}
+            </if>
+
+        </trim>
+        )
+    </insert>
+    <update id="updateById" parameterType="User">
+        update lib_user
+
+        <set>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="birthday!=null and birthday != '' ">
+                birthday=#{birthday},
+            </if>
+            <if test="academy!=null and academy!=''">
+                academy=#{academy},
+            </if>
+            <if test="grade!=null and grade!=''">
+                grade=#{grade},
+            </if>
+            <if test="sex!=null ">
+                sex=#{sex},
+            </if>
+            <if test="score!=null ">
+                score=#{score},
+            </if>
+            <if test="post!=null and post!=''">
+                post=#{post}
+            </if>
+        </set>
+
+        where id=#{id}
+    </update>
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from lib_user where id=#{id}
+    </delete>
+    <select id="selectById" resultType="com.zhang.librarytest.domain.User" parameterType="java.lang.Integer">
+        select *
+        from lib_user
+        where id = #{id}
+    </select>
+<!--    动态sql语句-->
+    <select id="selectList" resultType="User">
+        select * from lib_user
+        <where>
+            <if test="id != null">
+                id=#{id}
+            </if>
+            <if test="name !=null and  name!='' ">
+                and name=#{name }
+            </if>
+            <if test="birthday!=null">
+                and birthday=#{birthday }
+            </if>
+            <if test="academy!=null">
+                and academy=#{academy }
+            </if>
+            <if test="grade!=null">
+                and grade=#{grade }
+            </if>
+            <if test="sex!=null">
+                and sex=#{sex }
+            </if>
+            <if test="score!=null">
+                and score=#{score }
+            </if>
+            <if test="post!=null">
+                and post=#{post }
+            </if>
+
+        </where>
+
+    </select>
+</mapper>

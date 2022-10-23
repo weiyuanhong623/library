@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhang.librarytest.dao.UbDao">
+    <insert id="insert" parameterType="Ub">
+        insert into lib_ub (
+        <trim suffixOverrides=",">
+
+
+            <if test="uid!=null">
+                uid,
+            </if>
+
+
+            <if test="bid!=null">
+                bid,
+            </if>
+
+
+            <if test="lend_time!=null and lend_time!=''">
+                lend_time,
+            </if>
+
+
+            <if test="return_time!=null and return_time!=''">
+                return_time,
+            </if>
+
+        </trim>
+        ) values(
+        <trim suffixOverrides=",">
+
+
+            <if test="uid!=null">
+                #{uid},
+            </if>
+            <if test="bid!=null ">
+                #{bid},
+            </if>
+            <if test="lend_time!=null and lend_time!=''">
+                #{lend_time},
+            </if>
+            <if test="return_time!=null and return_time!=''">
+                #{return_time},
+            </if>
+
+        </trim>
+        )
+    </insert>
+    <update id="updateById" parameterType="Ub">
+        update lib_ub
+
+        <set>
+            <if test="uid!=null">
+                uid=#{uid},
+            </if>
+
+            <if test="bid!=null">
+                bid=#{bid},
+            </if>
+
+            <if test="lend_time!=null and lend_time!=''">
+                lend_time=#{lend_time},
+            </if>
+
+            <if test="return_time!=null and return_time!=''">
+                return_time=#{return_time}
+            </if>
+
+        </set>
+
+        where id=#{id}
+    </update>
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete
+        from lib_ub
+        where id = #{id}
+    </delete>
+
+    <select id="selectList" resultType="Ub">
+        select * from lib_ub
+        <where>
+            <if test="uid != null">
+                uid=#{uid}
+            </if>
+            <if test="bid != null">
+                bid=#{bid}
+            </if>
+            <if test="lend_time != null and lend_time != ''">
+                lend_time=#{lend_time}
+            </if>
+            <if test="return_time != null and return_time != ''">
+                return_time=#{return_time}
+            </if>
+        </where>
+    </select>
+    <select id="selectById" resultType="Ub" parameterType="java.lang.Integer">
+        select *
+        from lib_ub
+        where id = #{id}
+    </select>
+</mapper>

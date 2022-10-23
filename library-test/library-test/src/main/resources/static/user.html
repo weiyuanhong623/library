@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>首页</title>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <style>
+        /* 清除默认间隔*/
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        .mywrapper {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            background: red;
+            flex-direction: column;
+            flex-wrap: nowrap;
+        }
+
+        .myheader {
+            background: yellow;
+        }
+
+        .mycontainer {
+            flex: 1;
+            background: green;
+            display: flex;
+        }
+        /*flex 弹性盒子*/
+        .myaside {
+            padding: 5px;
+            background: aquamarine;
+            width: 200px;
+        }
+
+        .mymain {
+            flex: 1;
+            background: seashell;
+            padding: 5px;
+        }
+        .m-0 {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="mywrapper" id="app">
+    <div class="myheader">
+        <nav class="navbar navbar-default m-0">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">
+                        <img alt="Brand" src="img/1.jpeg" width="50" height="50">
+
+                    </a>
+                </div>
+                <h1 align="center" style="color: cornflowerblue">图书管理系统</h1>
+            </div>
+        </nav>
+    </div>
+    <div class="mycontainer">
+        <!--       侧边栏  -->
+        <div class="myaside">
+
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation" class="active"><a href="user.html">人员管理</a></li>
+                <li role="presentation"><a href="book.html">图书管理</a></li>
+                <li role="presentation"><a href="ub.html">借阅管理</a></li>
+            </ul>
+        </div>
+        <div class="mymain">
+            <!--           面包屑导航  -->
+            <ol class="breadcrumb">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Library</a></li>
+                <li class="active">Data</li>
+            </ol>
+            <!--           控制条  -->
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="" id="bs-example-navbar-collapse-1">
+                        <form class="navbar-form navbar-left">
+                            <div class="form-group">
+                                <input  v-model="queryParam.name" type="text" class="form-control" placeholder="Search">
+                            </div>
+                            <button type="submit" class="btn btn-default" @click="getList">搜索</button>
+                            <button type="submit" class="btn btn-default" @click="queryParam.name=null;getList()">重置</button>
+                            <button type="button" class="btn btn-primary"   @click="toAdd">新增</button>
+                        </form>
+
+
+
+
+                    </div>
+                </div>
+            </nav>
+            <!-- 表格数据 -->
+            <table class="table table-bordered">
+                <thead>
+                <th><input type="checkbox" v-model="isCheckAll" @click="isCheckAllSwitch"></th>
+                <th>姓名</th>
+                <th>生日</th>
+                <th>学院</th>
+                <th>班级</th>
+                <th>性别</th>
+                <th>积分</th>
+                <th>职位</th>
+                <th>操作</th>
+                </thead>
+                <tbody>
+                <tr v-for="(obj, index ) in users ">
+                    <td><input type="checkbox" v-model="checkIdx[index]"  @click="hasCheckAll(index)"></td>
+                    <td>{{obj.name}}</td>
+                    <td>{{obj.birthday}}</td>
+                    <td>{{ obj.academy}}</td>
+                    <td>{{ obj.grade}}</td>
+                    <td>{{ obj.sex}}</td>
+                    <td>{{ obj.score}}</td>
+                    <td>{{ obj.post}}</td>
+                    <td>
+
+                        <button type="button" class="btn btn-primary"  @click="toEdit(obj)" >编辑</button>
+                        <button type="button" class="btn btn-primary"  @click="delId=obj.id; msg='block'; msgModal=true" >删除</button>
+
+
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+
+            <!--            分页-->
+            <nav aria-label="Page navigation">
+
+                <ul class="pagination">
+                    <li >
+                        <a  aria-label="Previous" >
+                            总数:  <span disabled width="30" aria-hidden="true">{{total.total}}</span>
+                        </a>
+                    </li>
+                    <li  v-if="total.hasPreviousPage"  @click="getPage(total.prePage)">
+                        <a  aria-label="Previous" >
+                            <span  aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li  :class="{active: total.pageNum==obj}" v-for=" obj in total.navigatepageNums"><a href="#"  @click="getPage(obj)">{{ obj}}</a></li>
+
+                    <li v-if="total.hasNextPage" @click="getPage(total.nextPage)">
+                        <a href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <!-- Large modal -->
+
+    <!-- 新增模态框 -->
+    <div  class="modal fade " :class="{in:addModal}"  :style="{display: add}" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="addModal" >
+        <div class="modal-dialog modal-lg" role="document">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel"><span v-if="isEdit">编辑</span>
+                        <span v-if="!isEdit">新增</span>
+                    </h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">姓名</label>
+                            <div class="col-sm-10">
+                                <input v-model="user.name" type="text" class="form-control" id="inputEmail3" placeholder="姓名">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputEmail4" class="col-sm-2 control-label">生日</label>
+                            <div class="col-sm-10">
+                                <input v-model="user.birthday" type="text" class="form-control" id="inputEmail4" placeholder="生日">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail5" class="col-sm-2 control-label">学院</label>
+                            <div class="col-sm-10">
+                                <input v-model="user.academy" type="text"  class="form-control" id="inputEmail5" placeholder="学院">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail6" class="col-sm-2 control-label">班级</label>
+                            <div class="col-sm-10">
+                                <input v-model="user.grade" type="text" class="form-control" id="inputEmail6" placeholder="班级">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPassword7" class="col-sm-2 control-label">性别</label>
+                            <div class="col-sm-10">
+                                <input v-model="user.sex" type="text" class="form-control" id="inputPassword7" placeholder="性别">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPassword8" class="col-sm-2 control-label">积分</label>
+                            <div class="col-sm-10">
+                                <input v-model="user.score" type="text" class="form-control" id="inputPassword8" placeholder="积分">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPassword9" class="col-sm-2 control-label">职位</label>
+                            <div class="col-sm-10">
+                                <input v-model="user.post" type="text" class="form-control" id="inputPassword9" placeholder="职位">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-default"  @click="addObject" v-if="!isEdit" > 提交</button>
+                                <button type="submit" class="btn btn-default"  @click="editObject" v-if="isEdit" > 提交</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!--    消息模态框-->
+    <div  class="modal fade " :class="{in:msgModal}" :style="{display: msg}" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel2" id="msgModal" >
+        <div class="modal-dialog modal-lg" role="document">
+
+
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel2">消息</h4>
+                </div>
+
+                <div class="modal-body">
+                    确认删除
+                </div>
+                <div class="modal-footer">
+                    <button @click="delObject()"> 确认</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+<script src="js/jquery-3.6.1.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/axios.min.js"></script>
+<script>
+
+
+    Vue.prototype.$http = axios
+
+    var app = new Vue({
+        el: "#app",
+        data: {
+            // 分页总数
+            total:0,
+            // 全选按钮
+            isCheckAll: false,
+            checkIdx: [],
+            // 用户列表
+            users: {},
+            // 查询
+            queryParam:{
+                pageNum: 1,
+                pageSize:10
+            },
+            user: {},
+            isEdit: false,
+            delId: 0,
+            addModal:false,
+            msgModal:false,
+            msg:'none',
+            add: 'none'
+        },
+
+        created() {
+            this.getList()
+        },
+
+        methods: {
+            hello() {
+                console.log(1)
+            },
+            isCheckAllSwitch() {
+                for (var i = 0; i < this.users.length; i++) {
+                    this.checkIdx[i] = !this.isCheckAll
+                }
+            },
+            hasCheckAll(obj) {
+                this.checkIdx[obj] = !this.checkIdx[obj]
+                if (this.checkIdx.every(e => e) && this.checkIdx.length === this.users.length) {
+                    this.isCheckAll = true
+                } else {
+                    this.isCheckAll = false
+                }
+            },
+            // 获取列表
+            getList() {
+                this.$http.get("http://localhost:9000/user/list",{ params: this.queryParam} ).then(e => {
+                    this.users = e.data.data.data
+                    this.total=e.data.data.total
+                })
+            },
+            // 新增
+            addObject(){
+
+                this.$http.post("http://localhost:9000/user", this.user).then(e => {
+                    this.addModal=false
+                    this.add='none'
+                    this.getList()
+                })
+            },
+            // 编辑
+            editObject(obj){
+                this.$http.put("http://localhost:9000/user", this.user).then(e => {
+                    this.addModal=false
+                    this.add='none'
+                    this.getList()
+                })
+            },
+            // 删除
+            delObject(obj){
+
+                this.$http.delete("http://localhost:9000/user/"+this.delId).then(e => {
+                    this.msgModal=false
+                    this.msg='none'
+                    this.queryParam={}
+                    this.getList()
+                })
+            },
+            toEdit(obj){
+                this.add='block'
+                this.addModal=true
+                this.isEdit=true
+                this.user=obj
+            },
+            toAdd(){
+                this.add='block'
+                this.addModal=true
+                this.isEdit=false
+            },
+            getPage(obj){
+                this.queryParam.pageNum=obj
+                this.getList()
+            }
+
+        }
+
+    })
+
+
+</script>
+</html>
